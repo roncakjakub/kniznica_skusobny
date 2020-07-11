@@ -35,6 +35,14 @@
                         <textarea type="text" class="form-control" id="inputAbstract" required name="abstract"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="inputDate">Dátum publikácie</label>
+                        <input type="date" class="form-control" id="inputDate" required name="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTime">Čas publikácie</label>
+                        <input type="time" class="form-control" id="inputTime" required name="time">
+                    </div>
+                    <div class="form-group">
                         <label for="inputGenre">Žáner <br>
                         <small>Vyber zo zoznamu alebo vytvor nový</small></label>
 

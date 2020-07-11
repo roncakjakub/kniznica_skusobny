@@ -7,6 +7,7 @@ use App\Genre;
 use App\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class BookController extends Controller
 {
@@ -21,7 +22,10 @@ class BookController extends Controller
 
         $validator = Validator::make(
             $data, [
-            'search_word' => 'nullable|max:255'
+            'search_word' => 'nullable|max:255',
+            'sort_by' => ['nullable',Rule::in(['name','date'])],
+            'date_from' => ['nullable','date_format:Y-m-d'],
+            'date_to' => ['nullable','date_format:Y-m-d'],
         ]);
         if ($validator->fails()) {
             return redirect()->back()->with('errors', $validator->errors());
@@ -30,7 +34,18 @@ class BookController extends Controller
             if (!empty($data["search_word"])) {
                 $books = $books->where("books.name","LIKE","%".$data["search_word"]."%");
             }
-            $books = $books->orderBy('name')->get();
+            if (!empty($data["date_from"])) {
+                $books = $books->where("books.published_at",">",$data["date_from"]);
+            }
+            if (!empty($data["date_to"])) {
+                $books = $books->where("books.published_at","<",$data["date_to"]);
+            }
+
+                $orderer = "name";
+            if (!empty($data["sort_by"])) {
+                $orderer = $data["sort_by"] == 'name' ? 'name' : 'published_at';
+            }
+            $books = $books->orderBy($orderer)->get();
 
 
             $data['books'] = $books;
@@ -62,13 +77,15 @@ class BookController extends Controller
 
         $validator = Validator::make(
             $data, [
-            'name' => 'nullable|max:255',
+            'name' => 'required|max:255',
             'genre_id' => 'required_without:genre|exists:genres,id',
             'genre' => 'required_without:genre_id|max:255',
-            'isbn' => 'string|max:40',
-            'abstract' => 'max:255',
-            'email' => 'email|max:255',
-            'pages' => 'integer|min:1',
+            'isbn' => 'required|max:40',
+            'abstract' => 'required|max:255',
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
+            'email' => 'required|email|max:255',
+            'pages' => 'required|integer|min:1',
             'image' => 'nullable|image',
         ]);
         if ($validator->fails()) {
@@ -79,6 +96,7 @@ class BookController extends Controller
             $book->isbn = $data['isbn'];
             $book->abstract = $data['abstract'];
             $book->email = $data['email'];
+            $book->published_at = $data['date']." ".$data['time'];
             $book->pages = $data['pages'];
             if (!empty($data['genre_id'])) {
                 $book->genre_id = $data['genre_id'];
@@ -163,6 +181,6 @@ class BookController extends Controller
         if (!$book->delete()) {
             abort(500);
         }
-        return redirect()->route('index')->with('success', "Operácia bola úspešná");
+        return response()->json([],200);
     }
 }

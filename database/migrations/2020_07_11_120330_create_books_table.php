@@ -20,6 +20,7 @@ class CreateBooksTable extends Migration
             $table->foreignId('genre_id')->constrained()->onDelete('cascade');
             $table->text('abstract');
             $table->string('email');
+            $table->dateTime('published_at');
             $table->unsignedInteger('pages');
 
             $table->timestamps();

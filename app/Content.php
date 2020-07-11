@@ -2,14 +2,14 @@
 
 namespace App;
 
-use App\Traits\HasResources;
+use App\Traits\HasResource;
 use Illuminate\Database\Eloquent\Model;
 
 class Content extends Model
 {
     protected $hidden = ['contentable_type', 'contentable_id'];
     public $timestamps = false;
-    use HasResources;
+    use HasResource;
 
     public function model(){
         return $this->morphTo('contentable');

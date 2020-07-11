@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'BookController@index')->name('index');
+Route::post('add', 'BookController@store')->name('add_book');
+Route::get('add', 'BookController@create')->name('add_new_view');
+Route::delete('delete/{book}', 'BookController@destroy')->name('delete_Book');

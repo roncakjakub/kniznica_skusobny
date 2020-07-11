@@ -69,57 +69,12 @@ class ResourceController extends Controller
 
         return response()->json($ret["data"], $ret["status"]);
     }
-    public function StoreFile(Request $request){
-
-        $data = $request->all();
-        $ret = ["status" => 400,"data"=>[]];
-        $validator = Validator::make(
-            $request->all(), [
-                'file' => 'required|file',
-            ]
-        );
-        if ($validator->fails()) {
-
-            $ret['status'] = 422;
-
-        } else {
-            $file = $data['file'];
-
-            $fileName = $file->getClientOriginalName();
-            $address  =$this->generateAddress($file);
-            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-            $name = round(microtime(true) * 1000).substr(md5_file($file), 0,6);
-            $url = "";
-            if($fullurl = $file->store('files/'.$address."/", ['disk' => 'public_uploads'])) {
-                $url = 'uploads/'.$fullurl;
-                $ret["data"]["url"] = $url;
-                $ret["status"] = 200;
-            }
-        }
-
-        return response()->json($ret["data"], $ret["status"]);
-    }
-
     public function destroy(Resource $resource) {
-
         if ($resource->url) {
-
             if(!Storage::disk('public_uploads')->delete(substr($resource->url,strlen('uploads/')))) {
                 abort(500);
             }
             deleteEmptyFolders(generateTopPath($resource->url));
-        }
-        if ($resource->minified_url) {
-            if(!Storage::disk('public_uploads')->delete(substr($resource->minified_url,strlen('uploads/')))) {
-                abort(500);
-            }
-            deleteEmptyFolders(generateTopPath($resource->minified_url));
-        }
-        if ($resource->content()->exists()) {
-
-            if(!$resource->content()->delete()) {
-                abort(500);
-            }
         }
         if (!$resource->delete()) {
             abort(500);

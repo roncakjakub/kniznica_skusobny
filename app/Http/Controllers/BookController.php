@@ -45,8 +45,7 @@ class BookController extends Controller
             if (!empty($data["sort_by"])) {
                 $orderer = $data["sort_by"] == 'name' ? 'name' : 'published_at';
             }
-            $books = $books->orderBy($orderer)->get();
-
+            $books = $books->orderBy($orderer)->paginate(2);
 
             $data['books'] = $books;
             $data['genres'] = Genre::all();
